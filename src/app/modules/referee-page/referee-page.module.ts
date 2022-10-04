@@ -1,9 +1,12 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import { RefereePageComponent } from './components/referee-page/referee-page.component';
 
 
 @NgModule({
-    declarations: [],
+    declarations: [
+    RefereePageComponent
+  ],
     imports: [
         CommonModule
     ]
