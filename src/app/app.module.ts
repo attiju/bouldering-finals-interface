@@ -24,8 +24,7 @@ import {SharedModule} from "./modules/shared/shared.module";
         RefereePageModule,
     ],
     providers: [],
-    exports: [
-    ],
+    exports: [],
     bootstrap: [AppComponent]
 })
 export class AppModule {

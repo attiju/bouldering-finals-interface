@@ -1,13 +1,13 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import { OverlayPageComponent } from './components/overlay-page/overlay-page.component';
+import {OverlayPageComponent} from './components/overlay-page/overlay-page.component';
 import {SharedModule} from "../shared/shared.module";
 
 
 @NgModule({
     declarations: [
-    OverlayPageComponent
-  ],
+        OverlayPageComponent
+    ],
     imports: [
         CommonModule,
         SharedModule
