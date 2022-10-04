@@ -7,20 +7,25 @@ import {HomePageModule} from "./modules/home-page/home-page.module";
 import {OverlayPageModule} from "./modules/overlay-page/overlay-page.module";
 import {RefereePageModule} from "./modules/referee-page/referee-page.module";
 import {HttpClientModule} from "@angular/common/http";
+import {SharedModule} from "./modules/shared/shared.module";
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
     ],
     imports: [
         BrowserModule,
         AppRoutingModule,
+        HttpClientModule,
+
+        SharedModule,
         HomePageModule,
         OverlayPageModule,
         RefereePageModule,
-        HttpClientModule
     ],
     providers: [],
+    exports: [
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
