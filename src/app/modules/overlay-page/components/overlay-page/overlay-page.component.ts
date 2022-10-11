@@ -1,6 +1,4 @@
-import {Component, OnInit} from '@angular/core';
-import {CompetitionService} from "../../../../services/competition.service";
-import {Observable} from "rxjs";
+import {Component} from '@angular/core';
 
 @Component({
     selector: 'app-overlay-page',
@@ -11,17 +9,6 @@ import {Observable} from "rxjs";
     `,
     styles: []
 })
-export class OverlayPageComponent implements OnInit {
-
-    public vm$?: Observable<any>;
-
-    constructor(
-        private competitionService: CompetitionService
-    ) {
-    }
-
-    ngOnInit(): void {
-
-    }
+export class OverlayPageComponent {
 
 }

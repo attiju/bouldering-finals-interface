@@ -13,6 +13,7 @@ export interface Rules {
 
 export interface Climber {
     id: string,
+    competitionId: string,
     firstname: string,
     lastname: string,
     gender: Gender,

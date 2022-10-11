@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {map, Observable} from "rxjs";
-import {CompetitionService} from "../../../../services/competition.service";
+import {map, Observable, switchMap, timer} from "rxjs";
 import {Competition} from "../../../../models/competition";
+import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-leaderboard',
@@ -70,37 +71,44 @@ export class LeaderboardComponent implements OnInit {
     public vm$?: Observable<Competition>;
 
     constructor(
-        private competitionService: CompetitionService
+        private http: HttpClient
     ) {
     }
 
     ngOnInit(): void {
-        this.vm$ = this.competitionService.getCompetition()
-            .pipe(map(competition => {
-                return {
-                    ...competition,
-                    climbers: [...competition.climbers]
-                        .sort((c1, c2) => {
-                            const C1Tops = c1.boulders.filter(b => b.top.done).length;
-                            const C1TopTries = c1.boulders.filter(b => b.top.done).map(b => b.top.tries).reduce((acc, curr) => acc + curr, 0);
-                            const C1Zones = c1.boulders.filter(b => b.zone.done).length;
-                            const C1ZoneTries = c1.boulders.filter(b => b.zone.done).map(b => b.zone.tries).reduce((acc, curr) => acc + curr, 0);
-                            const C2Tops = c2.boulders.filter(b => b.top.done).length;
-                            const C2TopTries = c2.boulders.filter(b => b.top.done).map(b => b.top.tries).reduce((acc, curr) => acc + curr, 0);
-                            const C2Zones = c2.boulders.filter(b => b.zone.done).length;
-                            const C2ZoneTries = c2.boulders.filter(b => b.zone.done).map(b => b.zone.tries).reduce((acc, curr) => acc + curr, 0);
+        this.vm$ = timer(0, 30000)
+            .pipe(switchMap(genderTick => {
+                return timer(0, 5000)
+                    .pipe(switchMap(tick => {
+                        return this.http.get<Competition>(`${environment.api}/competitions/${environment.competitionId}`)
+                            .pipe(map(competition => {
+                                return {
+                                    ...competition,
+                                    climbers: [...competition.climbers]
+                                        .filter(c => c.gender === (genderTick & 1 ? 'female' : 'male'))
+                                        .sort((c1, c2) => {
+                                            const C1Tops = c1.boulders.filter(b => b.top.done).length;
+                                            const C1TopTries = c1.boulders.filter(b => b.top.done).map(b => b.top.tries).reduce((acc, curr) => acc + curr, 0);
+                                            const C1Zones = c1.boulders.filter(b => b.zone.done).length;
+                                            const C1ZoneTries = c1.boulders.filter(b => b.zone.done).map(b => b.zone.tries).reduce((acc, curr) => acc + curr, 0);
+                                            const C2Tops = c2.boulders.filter(b => b.top.done).length;
+                                            const C2TopTries = c2.boulders.filter(b => b.top.done).map(b => b.top.tries).reduce((acc, curr) => acc + curr, 0);
+                                            const C2Zones = c2.boulders.filter(b => b.zone.done).length;
+                                            const C2ZoneTries = c2.boulders.filter(b => b.zone.done).map(b => b.zone.tries).reduce((acc, curr) => acc + curr, 0);
 
-                            if (C1Tops > C2Tops) return -1
-                            else if (C2Tops > C1Tops) return 1;
-                            else if (C1Zones > C2Zones) return -1;
-                            else if (C2Zones > C1Zones) return 1;
-                            else if (C1TopTries > C2TopTries) return 1;
-                            else if (C2TopTries > C1TopTries) return -1;
-                            else if (C1ZoneTries > C2ZoneTries) return 1;
-                            else if (C2ZoneTries > C1ZoneTries) return -1;
-                            return 0;
-                        })
-                };
+                                            if (C1Tops > C2Tops) return -1
+                                            else if (C2Tops > C1Tops) return 1;
+                                            else if (C1Zones > C2Zones) return -1;
+                                            else if (C2Zones > C1Zones) return 1;
+                                            else if (C1TopTries > C2TopTries) return 1;
+                                            else if (C2TopTries > C1TopTries) return -1;
+                                            else if (C1ZoneTries > C2ZoneTries) return 1;
+                                            else if (C2ZoneTries > C1ZoneTries) return -1;
+                                            return 0;
+                                        })
+                                };
+                            }));
+                    }));
             }))
     }
 
