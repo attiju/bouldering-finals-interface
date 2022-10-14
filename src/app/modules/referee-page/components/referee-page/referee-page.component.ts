@@ -9,9 +9,22 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     selector: 'app-referee-page',
     template: `
         <div class="w-screen h-screen bg-gray-500 flex flex-col text-gray-200">
-            <div class="px-8 py-8 shadow relative">
+            <div class="px-8 py-8 flex flex-row justify-between shadow relative">
+                <div class="relative w-32">
+                    <select [(ngModel)]="climberFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option [value]="null">Tous</option>
+                        <option [value]="'male'">Hommes</option>
+                        <option [value]="'female'">Femmes</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                    </div>
+                </div>
                 <h1 class="text-center text-xl">Grimpeurs</h1>
-                <div class="absolute right-8 top-1/2 bottom-0 -translate-y-1/2">
+                <div class="flex justify-center items-center">
                     <button class="bg-green-300 hover:bg-green-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
                             (click)="climberAddModalOpen = true">+
                     </button>
@@ -19,15 +32,22 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
             </div>
             <div class="flex-1 bg-gray-100 overflow-auto px-4 py-8">
                 <ng-container *ngIf="vm$ | async as competition">
-                    <div *ngFor="let climber of climbers; let climberIndex = index"
+                    <div *ngFor="let climber of getClimbers(); let climberIndex = index"
                          class="bg-gray-400 rounded mb-4 overflow-hidden shadow">
-                        <div class="w-full text-center text-lg px-8 py-8 relative">
-                            {{ climber.firstname | titlecase }} {{ climber.lastname | uppercase }}
-                            <div class="absolute right-8 top-1/2 bottom-0 -translate-y-1/2">
+                        <div class="w-full text-center text-lg px-8 py-8 flex flex-row justify-between items-center">
+                            <div>
+                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center" (click)="climber.open = !climber.open">
+                                    {{ climber.open ? '▲' : '▼' }}
+                                </button>
+                            </div>
+                            <div>
+                                {{ climber.firstname | titlecase }} {{ climber.lastname | uppercase }}
+                            </div>
+                            <div class="justify-between items-center">
                                 <button class="bg-red-300 hover:bg-red-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center" (click)="removeClimber(climber)">-</button>
                             </div>
                         </div>
-                        <div class="bg-gray-200 text-black p-4">
+                        <div *ngIf="climber.open" class="bg-gray-200 text-black p-4">
                             <div *ngFor="let boulder of climber.boulders; let boulderIndex = index; let last = last">
                                 <div>Bloc n° {{ boulderIndex + 1 }}</div>
                                 <div class="flex flex-col">
@@ -119,6 +139,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class RefereePageComponent implements OnInit {
 
+    public climberFilter: 'male' | 'female' | null = null;
     public climberAddModalOpen = false;
     public vm$?: Observable<any>;
     public newClimber?: FormGroup;
@@ -142,6 +163,7 @@ export class RefereePageComponent implements OnInit {
                         ...competition,
                         climbers: competition.climbers
                             .sort((c1, c2) => (c1.firstname + c1.lastname).localeCompare(c2.firstname + c2.lastname))
+                            .map(c => ({ ...c, open: false }))
                     }
                 }),
                 tap(competition => {
@@ -193,6 +215,7 @@ export class RefereePageComponent implements OnInit {
 
     reinit(climber: Climber, boulderIndex: number) {
         this.http.put<Climber>(`${environment.api}/competitions/${environment.competitionId}/climbers/${climber.id}`, climber.boulders.map((b, i) => {
+            if (i != boulderIndex) return b;
             return {top: {done: false, tries: 0}, zone: {done: false, tries: 0}};
         })).subscribe(x => climber.boulders = x.boulders);
     }
@@ -200,5 +223,10 @@ export class RefereePageComponent implements OnInit {
     removeClimber(climber: Climber) {
         this.http.delete<void>(`${environment.api}/competitions/${environment.competitionId}/climbers/${climber.id}`)
             .subscribe(() => this.climbers = this.climbers?.filter(c => c.id !== climber.id));
+    }
+
+    public getClimbers(): Climber[] | undefined {
+        if (this.climberFilter === null) return this.climbers;
+        return this.climbers?.filter(c => c.gender === this.climberFilter);
     }
 }

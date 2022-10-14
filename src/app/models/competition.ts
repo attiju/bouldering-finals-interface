@@ -17,7 +17,8 @@ export interface Climber {
     firstname: string,
     lastname: string,
     gender: Gender,
-    boulders: BoulderInfo[]
+    boulders: BoulderInfo[],
+    open?: boolean,
 }
 
 export type Gender = 'male' | 'female';
