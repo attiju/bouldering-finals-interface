@@ -12,7 +12,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
             <div class="px-8 py-8 flex flex-row justify-between shadow relative">
                 <div class="relative w-32">
                     <select [(ngModel)]="climberFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option [value]="null">Tous</option>
+                        <option [value]="''">Tous</option>
                         <option [value]="'male'">Hommes</option>
                         <option [value]="'female'">Femmes</option>
                     </select>
@@ -139,7 +139,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class RefereePageComponent implements OnInit {
 
-    public climberFilter: 'male' | 'female' | null = null;
+    public climberFilter: 'male' | 'female' | '' = '';
     public climberAddModalOpen = false;
     public vm$?: Observable<any>;
     public newClimber?: FormGroup;
@@ -226,7 +226,7 @@ export class RefereePageComponent implements OnInit {
     }
 
     public getClimbers(): Climber[] | undefined {
-        if (this.climberFilter === null) return this.climbers;
+        if (this.climberFilter === '') return this.climbers;
         return this.climbers?.filter(c => c.gender === this.climberFilter);
     }
 }
