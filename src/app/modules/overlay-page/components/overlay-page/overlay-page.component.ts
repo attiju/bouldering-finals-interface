@@ -97,7 +97,7 @@ export class OverlayPageComponent implements OnInit {
     ngOnInit(): void {
         this.vm$ = timer(0, 30000)
             .pipe(switchMap(genderTick => {
-                return timer(0, 5000)
+                return timer(0, 1000)
                     .pipe(switchMap(tick => {
                         return this.route.queryParamMap.pipe(
                             switchMap(params => {
