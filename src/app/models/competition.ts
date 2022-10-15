@@ -1,7 +1,9 @@
 export interface Competition {
     id: string,
     rules: Rules,
-    climbers: Climber[]
+    climbers: Climber[],
+    males?: Climber[],
+    females?: Climber[]
 }
 
 export interface Rules {
